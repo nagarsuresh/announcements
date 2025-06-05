@@ -18,7 +18,9 @@ interface Announcement {
   priority?: 'high' | 'medium' | 'low';
 }
 
-const GIST_URL = 'https://gist.githubusercontent.com/nagarsuresh/49b8f070c57cd5df969a0a645936392f/raw/356cc8fd761d8d482ed9ad6f926c14eafbb5f5ab/whs-announcements.json';
+const ANNOUNCEMENTS_URL = 'https://raw.githubusercontent.com/nagarsuresh/announcements/refs/heads/main/assets/sample/announcements.json';
+
+
 
 // Refresh interval in milliseconds (1 minutes)
 const REFRESH_INTERVAL = 1 * 60 * 1000;
@@ -39,7 +41,7 @@ export default function Index() {
       }
       setError(null);
 
-      const response = await fetch(GIST_URL, {
+      const response = await fetch(ANNOUNCEMENTS_URL, {
         headers: {
           'Cache-Control': 'no-cache',
         },
@@ -49,7 +51,24 @@ export default function Index() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
+      // const data: Announcement[] = [
+      //   {
+      //     "summary": "Summer vacation starts June 2",
+      //     "description": "Summer vacations are starting June 2",
+      //     "priority": "high"
+      //   },
+      //   {
+      //     "summary": "Board meeting June 11",
+      //     "description": "There is a board meeting on June 11",
+      //     "priority": "medium"
+      //   },
+      //   {
+      //     "summary": "First day of school Aug 12",
+      //     "description": "first day of school is on august 12"
+      //   }
+      // ];
       const data: Announcement[] = await response.json();
+      console.log('Fetched data:', data);
       
       // Validate that data is an array
       if (!Array.isArray(data)) {
@@ -61,6 +80,7 @@ export default function Index() {
         item && (typeof item.summary === 'string' || typeof item.description === 'string')
       );
       
+      console.log('Valid announcements:', validAnnouncements);
       setAnnouncements(validAnnouncements);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
@@ -87,15 +107,32 @@ export default function Index() {
     return () => clearInterval(interval);
   }, [fetchAnnouncements]);
 
+  // const toggleExpansion = (index: number) => {
+  //   console.log('Toggling expansion for index:', index);
+  //   console.log('Current expanded items:', Array.from(expandedItems));
+  //   const newExpandedItems = new Set(expandedItems);
+  //   if (newExpandedItems.has(index)) {
+  //     newExpandedItems.delete(index);
+  //   } else {
+  //     newExpandedItems.add(index);
+  //     console.log('Expanded item at index:', index);
+  //   }
+  //   setExpandedItems(newExpandedItems);
+  //   console.log('New expanded items:', Array.from(newExpandedItems));
+  // };
+
   const toggleExpansion = (index: number) => {
-    const newExpandedItems = new Set(expandedItems);
-    if (newExpandedItems.has(index)) {
-      newExpandedItems.delete(index);
-    } else {
-      newExpandedItems.add(index);
-    }
-    setExpandedItems(newExpandedItems);
+    setExpandedItems(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(index)) {
+        newSet.delete(index);
+      } else {
+        newSet.add(index);
+      }
+      return new Set(newSet); // trigger state change
+    });
   };
+  
 
   const getPriorityColor = (priority: string | undefined) => {
     switch (priority?.toLowerCase()) {
@@ -245,7 +282,7 @@ export default function Index() {
             Last updated: {new Date().toLocaleTimeString()}
           </Text>
           <Text style={styles.footerSubtext}>
-            Updates automatically every 1 minutes
+            Updates automatically every 1 minute
           </Text>
         </View>
       </ScrollView>
