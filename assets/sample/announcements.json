@@ -1,0 +1,16 @@
+[
+    {
+      "summary": "Summer vacation starts June 2",
+      "description": "Summer vacations are starting June 2",
+      "priority": "high"
+    },
+    {
+      "summary": "Board meeting June 11",
+      "description": "There is a board meeting on June 11",
+      "priority": "medium"
+    },
+    {
+      "summary": "First day of school Aug 12",
+      "description": "first day of school is on august 12"
+    }
+  ]
